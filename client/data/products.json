@@ -1,0 +1,42 @@
+[
+  {
+    "id": "vintage-botanicals",
+    "title": "Vintage Botanicals Kit",
+    "price": 9.99,
+    "excerpt": "A set of vintage botanical ephemera and layered tags for journaling.",
+    "description": "A curated bundle of printable botanical illustrations, distressed paper backgrounds, and layered tag templates. Ready for print and crafting.",
+    "images": ["https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=800&q=60"],
+    "contents": ["12 printable tags", "3 background sheets", "2 cover designs", "Instructions"],
+    "template": "botanical-1"
+  },
+  {
+    "id": "grunge-ephemera",
+    "title": "Grunge Ephemera Pack",
+    "price": 7.5,
+    "excerpt": "Textures, torn edges, and vintage labels to build layered pages.",
+    "description": "This pack contains textured papers, labels, and small ephemera pieces in muted tones — great for grunge and retro junk journals.",
+    "images": ["https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=60"],
+    "contents": ["10 background textures", "15 labels & tags", "3 frame elements"],
+    "template": "grunge-1"
+  },
+  {
+    "id": "neutral-papers",
+    "title": "Neutral Papers Set",
+    "price": 5.0,
+    "excerpt": "A versatile pack of neutral-toned papers and subtle patterns.",
+    "description": "Soft neutrals and subtle patterns sized for print. Use these for base pages, layering, and printable inserts.",
+    "images": ["https://images.unsplash.com/photo-1495954484750-af469f2f9be5?auto=format&fit=crop&w=800&q=60"],
+    "contents": ["8 paper sheets", "4 pattern overlays"],
+    "template": "neutral-1"
+  },
+  {
+    "id": "floral-tags",
+    "title": "Floral Tag Collection",
+    "price": 4.99,
+    "excerpt": "Printable floral tags and ticket shapes with delicate borders.",
+    "description": "A small collection of floral tag templates in multiple sizes, ready to print and cut for journaling projects.",
+    "images": ["https://images.unsplash.com/photo-1501004318640-e5a32a2a4c9b?auto=format&fit=crop&w=800&q=60"],
+    "contents": ["12 tag templates", "2 label sheets"],
+    "template": "floral-1"
+  }
+]

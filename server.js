@@ -1,11 +1,14 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const PDFDocument = require('pdfkit');
 const axios = require('axios');
 const sharp = require('sharp');
+const Stripe = require('stripe');
 
 const app = express();
-app.use(bodyParser.json({ limit: '10mb' }));
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_your_key_here');
+
+app.use('/webhook', express.raw({ type: 'application/json' }));
+app.use(express.json({ limit: '10mb' }));
 
 async function fetchImageBuffer(src) {
   if (!src) return null;
@@ -22,6 +25,76 @@ async function fetchImageBuffer(src) {
 
 app.get('/health', (req, res) => {
   res.json({ ok: true, message: 'JunkJournalKit API is running' });
+});
+
+app.post('/create-checkout-session', async (req, res) => {
+  try {
+    const items = req.body?.items || [];
+
+    if (!items.length) {
+      return res.status(400).json({ error: 'Your cart is empty.' });
+    }
+
+    if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === 'sk_test_your_key_here') {
+      return res.status(400).json({
+        error: 'Stripe is not configured. Add STRIPE_SECRET_KEY to your local .env file before checkout.'
+      });
+    }
+
+    const lineItems = items.map((item) => ({
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: item.title,
+          images: item.images && item.images[0] ? [item.images[0]] : [],
+        },
+        unit_amount: Math.round((Number(item.price) || 0) * 100),
+      },
+      quantity: item.quantity || 1,
+    }));
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: lineItems,
+      success_url: `${process.env.APP_URL || 'http://localhost:5173'}?checkout=success`,
+      cancel_url: `${process.env.APP_URL || 'http://localhost:5173'}/cart?checkout=cancel`,
+      metadata: {
+        cart: JSON.stringify(items),
+      },
+    });
+
+    res.json({ url: session.url });
+  } catch (error) {
+    console.error('Checkout creation failed:', error);
+    res.status(500).json({ error: error.message || 'Failed to create Stripe Checkout session.' });
+  }
+});
+
+app.post('/webhook', async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!endpointSecret || !sig) {
+    return res.status(400).send('Missing Stripe webhook configuration');
+  }
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    console.log('Checkout completed for session:', session.id);
+    console.log('Customer metadata:', session.metadata);
+  }
+
+  res.json({ received: true });
 });
 
 app.post('/generate', async (req, res) => {

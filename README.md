@@ -1,32 +1,34 @@
-# JunkJournalKit
+# Stripe checkout setup
 
-A starter app for building printable junk-journal kits like a curated DIY paper craft product site. This repo includes:
+This app includes a Stripe Checkout route for product purchases.
 
-- Express API for generating a print-ready PDF kit
-- Vite + React frontend for a simple kit builder demo
-- Original naming and design choices that avoid trademarked names/logos
+## 1) Install dependencies
 
-## Quick start
+npm install
+npm --prefix client install
 
-1. Install dependencies:
-   npm install
-   npm --prefix client install
-2. Run the app:
-   npm run dev
-3. Open the frontend at http://localhost:5173
-4. Click "Generate PDF" to download a sample junk-journal kit PDF from the API.
+## 2) Add environment variables
 
-## Production build
+Create a `.env` file in the project root:
 
-npm run build
+STRIPE_SECRET_KEY=sk_test_your_key_here
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
+APP_URL=http://localhost:5173
 
-## Notes
+## 3) Run the app
 
-- The sample kit generator is intentionally lightweight and designed to be extended.
-- Replace the sample template and PDF generation logic with your own asset library, upload flows, editing features, and print-ready export logic.
-- Use only original assets, public-domain assets, or assets the user has rights to use.
+npm run dev
 
-## App structure
+## 4) Test checkout
 
-- `server.js` — Express API that generates a PDF from layout JSON
-- `client/` — React frontend with a demo kit builder UI
+- Add products to the cart.
+- Click Checkout.
+- Stripe redirects to a live Stripe Checkout session if your secret key is valid.
+
+## 5) Webhook testing
+
+Use Stripe CLI to forward webhook events locally:
+
+stripe listen --forward-to localhost:4000/webhook
+
+Then trigger a test event such as `checkout.session.completed` from the Stripe dashboard or CLI.

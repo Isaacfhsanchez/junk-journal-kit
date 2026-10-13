@@ -4,6 +4,28 @@ import { useCart } from '../context/CartContext.jsx';
 export default function Cart() {
   const { cart, updateQty, removeItem, clearCart, total } = useCart();
 
+  const handleCheckout = async () => {
+    try {
+      const response = await fetch('/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: cart })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to start checkout');
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      alert(error.message || 'Checkout failed');
+    }
+  };
+
   return (
     <main className="cart-page">
       <h2>Your Cart</h2>
@@ -31,7 +53,7 @@ export default function Cart() {
           <div className="cart-summary">
             <p>Total: <strong>${total.toFixed(2)}</strong></p>
             <div style={{ display: 'flex', gap: 12 }}>
-              <button onClick={() => alert('Checkout flow coming soon')}>Checkout</button>
+              <button onClick={handleCheckout}>Checkout</button>
               <button className="secondary" onClick={() => clearCart()}>Clear</button>
             </div>
           </div>
